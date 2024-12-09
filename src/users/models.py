@@ -7,4 +7,4 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=11, unique=True, null=True, blank=True)
 
     def __str__(self):
-        return self.phone_number
+        return self.phone_number or self.username
