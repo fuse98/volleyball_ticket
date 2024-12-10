@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from matches.models import Stadium, SeatingArrangment, Seat
+from matches.models import Stadium, SeatingArrangment, Seat, Match, Ticket
 
 
 class StadiumSerializer(serializers.ModelSerializer):
@@ -41,3 +41,34 @@ class SeatingArrangementSerializer(serializers.ModelSerializer):
         Seat.objects.bulk_create(seats, batch_size=1000)
 
         return seating_arrangement
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ['seat', 'price', 'team']
+
+
+class MatchCreateSerializer(serializers.ModelSerializer):
+    # TODO improve validation functions to reduce db queries
+    tickets = TicketSerializer(many=True)
+
+    def create(self, validated_data):
+        tickets_data = validated_data.pop('tickets')
+        match_instance = Match.objects.create(**validated_data)
+
+        # TODO:check team a and team b differ
+        # TODO:check all seats in seat arrangement
+        # TODO:check all seats in seat arrangement have tickets
+        # TODO:check all teams be team a or team b or None
+        # TODO:check no match is happening at the same time period in the stadium
+        tickets = []
+        for ticket_data in tickets_data:
+            tickets.append(Ticket(match_instance=match_instance, **ticket_data))
+        Ticket.objects.bulk_create(tickets, batch_size=1000)
+
+        return match_instance
+
+    class Meta:
+        model = Match
+        fields = '__all__'

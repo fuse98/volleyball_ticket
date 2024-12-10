@@ -40,3 +40,28 @@ class Seat(models.Model):
         
         name += f'row: {self.row}, column: {self.column}'
         return name
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class Match(models.Model):
+    class Status(models.IntegerChoices):
+        DRAFT = 0, 'Draft'
+        PUBLISHED = 1, 'Published',
+
+    team_a = models.ForeignKey(Team, on_delete=models.PROTECT, related_name='matches_as_team_a')
+    team_b = models.ForeignKey(Team, on_delete=models.PROTECT, related_name='matches_as_team_b')
+
+    seating_arrangement = models.ForeignKey(SeatingArrangment, on_delete=models.PROTECT)
+
+    match_datetime = models.DateTimeField()
+    status = models.IntegerField(choices=Status.choices, default=Status.DRAFT)
+
+
+class Ticket(models.Model):
+    match_instance = models.ForeignKey(Match, on_delete=models.PROTECT, related_name='tickets')
+    seat = models.ForeignKey(Seat, on_delete=models.PROTECT)
+    team = models.ForeignKey(Team, null=True, on_delete=models.SET_NULL)
+    price = models.PositiveIntegerField()
