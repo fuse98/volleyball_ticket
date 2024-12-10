@@ -18,12 +18,20 @@ from django.contrib import admin
 from django.urls import path
 
 from users.views import UserRegistrationView, AuthTokenView
-from matches.views import StadiumCreateView, SeatingArrangementCreateView, MatchCreateView
+from matches.views import (
+    StadiumCreateView,
+    SeatingArrangementCreateView,
+    MatchCreateView,
+    ReserveTicketsView,
+    MatchPublishView,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('users/register/', UserRegistrationView.as_view(), name='users_registration'),
     path('users/auth-token/', AuthTokenView.as_view(), name='users_auth_token'),
+
     path('matches/stadium/create/', StadiumCreateView.as_view(), name='matches_stadium_create'),
     path(
         'matches/seating-arrangement/create/',
@@ -31,4 +39,6 @@ urlpatterns = [
         name='matches_seating_arrangement_create'
     ),
     path('matches/match/create/', MatchCreateView.as_view(), name='matches_match_create'),
+    path('matches/match/<int:match_id>/publish/', MatchPublishView.as_view(), name='matches_match_publish'),
+    path('matches/ticket/reserve/', ReserveTicketsView.as_view(), name='matches_ticket_reserve'),
 ]

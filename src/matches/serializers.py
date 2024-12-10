@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from matches.models import Stadium, SeatingArrangment, Seat, Match, Ticket
+from matches.models import Stadium, SeatingArrangment, Seat, Match, Ticket, TicketFactor
 
 
 class StadiumSerializer(serializers.ModelSerializer):
@@ -46,7 +46,7 @@ class SeatingArrangementSerializer(serializers.ModelSerializer):
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
-        fields = ['seat', 'price', 'team']
+        fields = ['id', 'seat', 'price', 'team']
 
 
 class MatchCreateSerializer(serializers.ModelSerializer):
@@ -72,3 +72,10 @@ class MatchCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
         fields = '__all__'
+
+
+class TicketFactorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TicketFactor
+        exclude = ['verification_code']
+

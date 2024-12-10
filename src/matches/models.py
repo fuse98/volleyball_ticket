@@ -1,3 +1,4 @@
+import secrets
 from django.db import models
 from users.models import CustomUser
 
@@ -60,8 +61,44 @@ class Match(models.Model):
     status = models.IntegerField(choices=Status.choices, default=Status.DRAFT)
 
 
+class TicketFactor(models.Model):
+    class Status(models.IntegerChoices):
+        WAITING_FOR_PAYMENT = 0, 'Waiting for payment'
+        PAYED = 1, 'Payed'
+        CANCELED = 2, 'Canceled'
+
+    # A human readable code for verifying tickets purchase
+    verification_code = models.CharField(max_length=10, unique=True)
+    amount = models.PositiveIntegerField()
+    status = models.IntegerField(choices=Status.choices, default=Status.WAITING_FOR_PAYMENT)
+    created_at = models.DateTimeField(auto_now_add=True)
+    buyer = models.ForeignKey(CustomUser, on_delete=models.PROTECT)
+
+    @classmethod
+    def generate_unique_verification_code(cls):
+        while True:
+            code = secrets.randbelow(10**10)
+            code_str = f"{code:010}"
+            if not cls.objects.filter(verification_code=code_str).exists():
+                return code_str
+
+
 class Ticket(models.Model):
+    class Status(models.IntegerChoices):
+        AVAILABLE = 0, 'Available'
+        RESERVED_FOR_PAYMENT = 1, 'Reserved for payment'
+        SOLD = 2, 'Sold'
+
     match_instance = models.ForeignKey(Match, on_delete=models.PROTECT, related_name='tickets')
     seat = models.ForeignKey(Seat, on_delete=models.PROTECT)
     team = models.ForeignKey(Team, null=True, on_delete=models.SET_NULL)
     price = models.PositiveIntegerField()
+    status = models.IntegerField(choices=Status.choices, default=Status.AVAILABLE)
+
+    ticket_factor = models.ForeignKey(
+        TicketFactor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='tickets'
+    )
