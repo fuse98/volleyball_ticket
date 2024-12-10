@@ -18,11 +18,16 @@ from django.contrib import admin
 from django.urls import path
 
 from users.views import UserRegistrationView, AuthTokenView
-from matches.views import StadiumCreateView
+from matches.views import StadiumCreateView, SeatingArrangementCreateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/register/', UserRegistrationView.as_view(), name='users_registration'),
     path('users/auth-token/', AuthTokenView.as_view(), name='users_auth_token'),
     path('matches/stadium/create/', StadiumCreateView.as_view(), name='matches_stadium_create'),
+    path(
+        'matches/seating-arrangement/create/',
+        SeatingArrangementCreateView.as_view(),
+        name='matches_seating_arrangement_create'
+    ),
 ]
