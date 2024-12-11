@@ -17,6 +17,10 @@ def publish_match(match_id):
 
 
 def reserve_tickets(ticket_ids, user):
+    '''
+    This function reserves tickets for user. By locking the appropriate rows
+    of DB this function prevents race conditions. 
+    '''
     if not ticket_ids:
         raise TicketReservationError("No ticket IDs provided.")
 

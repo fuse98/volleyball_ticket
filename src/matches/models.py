@@ -14,15 +14,31 @@ class Stadium(models.Model):
 
 
 class SeatingArrangment(models.Model):
+    '''
+    Represents seating arrangement of a stadium. This model enables a stadium
+    to have multiple seating arrangements and choosing the proper one for each 
+    match.
+    '''
     stadium = models.ForeignKey(Stadium, on_delete=models.PROTECT)
 
 
 class Seat(models.Model):
+    '''
+    Represents a seat in a seating arrangement of a stadium
+
+    column: Seat real world identifier.
+    row: Seat real world identifier.
+    section: Seat real world identifier.
+
+    pos_x, pos_y: Coordination of seat in a visual representation.
+    seating_arrangment: The seating arrangement the seat belongs to.
+
+    '''
+
     column = models.CharField(max_length=5)
     row = models.CharField(max_length=5)
     section = models.CharField(max_length=5, null=True, blank=True)
 
-    # position for visual represntation
     pos_x = models.IntegerField()
     pos_y = models.IntegerField()
 
@@ -48,6 +64,14 @@ class Team(models.Model):
 
 
 class Match(models.Model):
+    '''
+    Represents a match between team_a and team_b on match_datetime.
+
+    status: Having status enables being able to create matches in multiple stages and not
+            publishing a match before it is intended to.
+
+    seating_arrangement: matches tickets are created based on the seating arrangement.
+    '''
     class Status(models.IntegerChoices):
         DRAFT = 0, 'Draft'
         PUBLISHED = 1, 'Published',
@@ -62,6 +86,14 @@ class Match(models.Model):
 
 
 class TicketFactor(models.Model):
+    '''
+    Represents bought tickets or reservation for buying tickets before payment.
+
+    verification_code: A human readable code for verifying tickets purchase
+    amount: Total amount of required payment
+    created_at: Important when we want to take unpayed ticket factors(in state of WAITING_FOR_PAYMENT)
+                to state of CANCEL.
+    '''
     class Status(models.IntegerChoices):
         WAITING_FOR_PAYMENT = 0, 'Waiting for payment'
         PAYED = 1, 'Payed'
@@ -84,6 +116,14 @@ class TicketFactor(models.Model):
 
 
 class Ticket(models.Model):
+    '''
+        Tickets are the connection between seat and match holding extra data like price and team
+        they are defined for each seat of the seating arrangment for match enabling dynamic 
+        price and team location.
+
+        team: represents which team the seat belongs to. Can be null meaning the seat is neutral
+        price: price of the ticket. 
+    '''
     class Status(models.IntegerChoices):
         AVAILABLE = 0, 'Available'
         RESERVED_FOR_PAYMENT = 1, 'Reserved for payment'

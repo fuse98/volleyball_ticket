@@ -75,6 +75,7 @@ class MatchCreateSerializer(serializers.ModelSerializer):
 
 
 class TicketFactorSerializer(serializers.ModelSerializer):
+    # TODO: implement a more extended serilizer to include nested fields
     class Meta:
         model = TicketFactor
         fields = '__all__'
