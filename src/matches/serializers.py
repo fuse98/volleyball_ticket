@@ -77,5 +77,4 @@ class MatchCreateSerializer(serializers.ModelSerializer):
 class TicketFactorSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketFactor
-        exclude = ['verification_code']
-
+        fields = '__all__'

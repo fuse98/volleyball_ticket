@@ -5,3 +5,6 @@ class TicketReservationError(Exception):
 
 class PublishMatchError(Exception):
     pass
+
+class FinalizeTicketFactoryError(Exception):
+    pass

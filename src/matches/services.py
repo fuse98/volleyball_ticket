@@ -1,7 +1,7 @@
 
 from django.db import transaction
 from matches.models import Ticket, Match, TicketFactor
-from matches.exceptions import TicketReservationError, PublishMatchError
+from matches.exceptions import TicketReservationError, PublishMatchError, FinalizeTicketFactoryError
 
 
 def publish_match(match_id):
@@ -52,4 +52,15 @@ def reserve_tickets(ticket_ids, user):
             ticket.ticket_factor = ticket_factor
         Ticket.objects.bulk_update(tickets, ['status', 'ticket_factor'])
 
+        return ticket_factor
+
+
+def finailize_ticket_factor(ticket_factor_id):
+    with transaction.atomic():
+        ticket_factor = TicketFactor.objects.get(id=ticket_factor_id)
+        if ticket_factor.status != TicketFactor.Status.WAITING_FOR_PAYMENT:
+            raise FinalizeTicketFactoryError("Ticket Factor is not in the correct state.")
+
+        ticket_factor.tickets.update(status=Ticket.Status.SOLD)
+        ticket_factor.status = TicketFactor.Status.PAYED
         return ticket_factor

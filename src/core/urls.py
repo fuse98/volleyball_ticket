@@ -24,6 +24,7 @@ from matches.views import (
     MatchCreateView,
     ReserveTicketsView,
     MatchPublishView,
+    FinalizeTicketFactorView,
 )
 
 urlpatterns = [
@@ -41,4 +42,5 @@ urlpatterns = [
     path('matches/match/create/', MatchCreateView.as_view(), name='matches_match_create'),
     path('matches/match/<int:match_id>/publish/', MatchPublishView.as_view(), name='matches_match_publish'),
     path('matches/ticket/reserve/', ReserveTicketsView.as_view(), name='matches_ticket_reserve'),
+    path('matches/ticket-factor/<int:ticket_factor_id>/finalize/', FinalizeTicketFactorView.as_view(), name='matches_ticket_factor_finalize'),
 ]

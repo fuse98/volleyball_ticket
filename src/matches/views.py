@@ -9,10 +9,10 @@ from matches.serializers import (
     MatchCreateSerializer,
     TicketFactorSerializer,
 )
-from matches.exceptions import TicketReservationError, PublishMatchError
-from matches.services import reserve_tickets, publish_match
+from matches.exceptions import TicketReservationError, PublishMatchError, FinalizeTicketFactoryError
+from matches.services import reserve_tickets, publish_match, finailize_ticket_factor
 from users.permissions import IsStadiumAdmin
-
+from matches.models import TicketFactor
 
 class StadiumCreateView(APIView):
     permission_classes = [IsStadiumAdmin]
@@ -61,7 +61,7 @@ class MatchPublishView(APIView):
 class ReserveTicketsView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         ticket_ids = request.data.get('ticket_ids', [])
         try:
             ticket_factor = reserve_tickets(ticket_ids, request.user)
@@ -69,3 +69,18 @@ class ReserveTicketsView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except TicketReservationError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FinalizeTicketFactorView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    # dummy api to finalize ticket_factor(should be done in payment callback api)
+    def post(self, requset, ticket_factor_id):
+        try:
+            ticket_factor = finailize_ticket_factor(ticket_factor_id)
+            serializer = TicketFactorSerializer(ticket_factor)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except TicketFactor.DoesNotExist:
+            Response({'error': f'Ticket factor ({ticket_factor_id}) not found'}, status=status.HTTP_404_NOT_FOUND)
+        except FinalizeTicketFactoryError as e:
+            Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
